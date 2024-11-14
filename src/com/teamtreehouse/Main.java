@@ -1,23 +1,35 @@
 package com.teamtreehouse;
+
 import java.util.List;
-import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
-        // Step 1: Use Scanner to read user input for the story template
-        Scanner scanner = new Scanner(System.in);
-        // Ask the user to enter a template story with placeholders
-        System.out.println("Please enter your story template (use placeholders like name, adjective, etc.):");
-        String story = scanner.nextLine();  // User enters a new story template
-        // Step 2: Create Template object from the story
-        Template tmpl = new Template(story);
-        // Step 3: Create Prompter object to prompt for words
-        Prompter prompter = new Prompter();
-        // Step 4: Run the prompter to collect the values for placeholders (returns List<String>)
-        List<String> results = prompter.run(tmpl);  // Prompts user for words
-        // Step 5: Render the story using the user's input (replace placeholders with their inputs)
-        String renderedStory = tmpl.render(results);
-        // Step 6: Display the final "TreeStory" to the user
-        System.out.println("\nYour TreeStory:\n");
-        System.out.println(renderedStory);  // This is where the TreeStory is presented to the user
+        // Story template with placeholders for user input
+        String story = "Thanks __name__ for helping me out. You are really a __adjective__ __noun__ and I owe you a __noun__.";
+        Template tmpl = new Template(story);  // Create a new template
+        Prompter prompter = new Prompter();   // Create a new prompter
+
+        // Run the prompter to collect user inputs based on the template
+        List<String> results = prompter.run(tmpl);  // Prompt user for words
+
+        // If the results are null, it means the user failed too many times
+        if (results == null) {
+            System.out.println("User input invalid, exiting...");
+            return;  // Exit gracefully if user input is invalid (too many retries)
+        }
+
+        // Check if the number of inputs matches the number of placeholders in the template
+        if (results.size() != tmpl.getPlaceHolders().size()) {
+            System.out.println("Invalid number of inputs. Exiting...");
+            return;  // Exit if the number of inputs doesn't match the placeholders
+        }
+
+        // If everything is valid, render and print the story
+        try {
+            String renderedStory = tmpl.render(results);
+            System.out.printf("Your TreeStory:%n%n%s", renderedStory);
+        } catch (Exception e) {
+            System.out.println("An error occurred while rendering the story: " + e.getMessage());
+        }
     }
 }
